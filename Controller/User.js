@@ -1,6 +1,7 @@
 let services = require('../services/services.js');
 const nodemailer = require("nodemailer");
 const uuid = require('uuidv4');
+const { check, validationResult } = require('express-validator');
 
 let generateOTP = () => {
           
@@ -15,73 +16,47 @@ let generateOTP = () => {
 let create = (req, res) => {
     console.log('prateek1');
    let body = req.body
-    console.log("req=====>>>>", req.body);
-    body.user_registration_id = uuid();
-    body.otp_requested = generateOTP();
-    
-        console.log("body ==============>>>>>>>", body);
-        services.create(body).then((obj) => {
-            new Promise ((resolve) =>  {
-                main(body.otp_requested)
-                resolve("sent")
-            }).then((resolve) => {
-                console.log('inserted');
-                res.status(200).send('inserted');
-            }).catch((err) => {
-                console.log(err);
-            })
-        }).catch((err) => {
-            console.log(err);
-        })
 
-}
+   if(body.hasOwnProperty('first_name') && body.hasOwnProperty('user_email') && body.hasOwnProperty('user_password') && body.hasOwnProperty('dob') && body.hasOwnProperty('email_verified_status')){
 
-async function main(otp){
+        if(body.firt_name !== ''){
+            if(body.user_email !== ''){
+                if(body.user_password !== ''){
+                    if(body.dob !== ''){
+                        if(body.email_verified_status !== ''){
 
-    // Generate test SMTP service account from ethereal.email
-    // Only needed if you don't have a real mail account for testing
-    //let testAccount = await nodemailer.createTestAccount();
+                            console.log("req=====>>>>", req.body);
+                            body.user_registration_id = uuid();
+                            body.otp_requested = generateOTP();
+                            
+                                console.log("body ==============>>>>>>>", body);
+                                services.create(body).then((obj) => {
+                                    new Promise ((resolve) =>  {
+                                        main(body.otp_requested)
+                                        resolve("sent")
+                                    }).then((resolve) => {
+                                        console.log('inserted');
+                                        res.status(200).send('inserted');
+                                    }).catch((err) => {
+                                        console.log(err);
+                                    })
+                                }).catch((err) => {
+                                    console.log(err);
+                                })
 
-    // create reusable transporter object using the default SMTP transport
-    let transporter = nodemailer.createTransport({
-        host: "smtp.gmail.com",
-        port: 465,
-        secure: true, // true for 465, false for other ports
-        auth: {
-            user: "prateek@cronj.com", // generated ethereal user
-            pass: "ithinkiamgood@" // generated ethereal password
+                        } else{
+
+                        }
+                    }
+                }
+            }
         }
-    });
-
-    // send mail with defined transport object
-    let info = await transporter.sendMail({
-        from: '"Prateek" prateek@cronj.com', // sender address
-        to: "prateekneo123@gmail.com", // list of receivers
-        subject: "Verify Email", // Subject line
-        text: "Your OTP is : " + otp, // plain text body
-        html: "Your OTP is : <b>" + otp + "</b>" // html body
-    });
-
-    console.log("Message sent: %s", info.messageId);
-    // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
-
-    // Preview only available when sending through an Ethereal account
-    console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
-    // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
-}
-
-let send_mail = (req, res) => {
-
+   }
     
 
-    main().then(()=>{
-        console.log("mail sent");
-    }).catch((err) => {
-        console.log(err);
-    })
-
-    // async..await is not allowed in global scope, must use a wrapper
 }
+
+
 
 let signin = (req, res) => {
 

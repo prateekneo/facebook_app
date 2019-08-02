@@ -13,7 +13,8 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import { connect } from 'react-redux'
-import loginUser from '../actions/index'
+import { loginUser } from '../actions/index'
+import { saveToken } from '../actions/index'
 
 import { createBrowserHistory } from 'history';
 
@@ -37,8 +38,17 @@ const useStyles = makeStyles(theme => ({
       backgroundColor: theme.palette.common.white,
     },
   },
+  head : {
+    padding : theme.spacing(4),
+    backgroundColor: '#c51162'
+  },
+  foot : {
+    padding : theme.spacing(4),
+    backgroundColor: '#c51162'
+  },
   paper: {
-    marginTop: theme.spacing(8),
+    marginTop: theme.spacing(0),
+    marginBottom: theme.spacing(2),
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
@@ -66,6 +76,7 @@ class SignupClass extends React.Component {
             email : '',
             password : '',
             dob : 'mm/dd/yyyy',
+            message : '',
             validateFirstName : null,
             validateLastName : null,
             validateEmail : null,
@@ -78,19 +89,22 @@ class SignupClass extends React.Component {
                     if(!regName.test(name)){
                         this.setState({
                             validateFirstName : "error",
-                            firstName : e.target.value
+                            firstName : e.target.value,
+                            message : ''
                         })
 
                     }else{
                         this.setState({
                             validateFirstName : null,
-                            firstName : e.target.value
+                            firstName : e.target.value,
+                            message : ''
                         })
                     }
                 } else {
                     this.setSate({
                         validateFirstName : "error",
-                        firstName : e.target.value
+                        firstName : e.target.value,
+                        message : ''
                     })
                 }
                         
@@ -102,19 +116,22 @@ class SignupClass extends React.Component {
                     if(!regName.test(name)){
                         this.setState({
                             validateLastName : "error",
-                            lastName : e.target.value
+                            lastName : e.target.value,
+                            message : ''
                         })
 
                     }else{
                         this.setState({
                             validateLastName : null,
-                            lastName : e.target.value
+                            lastName : e.target.value,
+                            message : ''
                         })
                     }
                 } else {
                     this.setSate({
                         validateLastName : "error",
-                        lastName : e.target.value
+                        lastName : e.target.value,
+                        message : ''
                     })
                 }
         
@@ -126,37 +143,52 @@ class SignupClass extends React.Component {
                     if(!regEmail.test(Email)){
                         this.setState({
                             validateEmail : "error",
-                            email : e.target.value
+                            email : e.target.value,
+                            message : '',
                         })
 
                     }else{
                         this.setState({
                             validateEmail : null,
-                            email : e.target.value
+                            email : e.target.value,
+                            message : ''
                         })
                     }
                 } else {
                     this.setSate({
                         validateEmail : "error",
-                        email : e.target.value
+                        email : e.target.value,
+                        message : ''
                     })
                 }
             },
             handlePassword : (e) => {
-                this.setState({
-                    password : e.target.value
-                })
+                if(e.target.value.length >= 8){
+                    this.setState({
+                        password : e.target.value,
+                        validatePassword : null,
+                        message : ''
+                    })
+                } else{
+                    this.setState({
+                        password : e.target.value,
+                        validatePassword : 'error',
+                        message : ''
+                    })
+                }
+                
             },
             handleDateChange : (e) => {
                 this.setState({
                     validateDob : null,
-                    dob : e.target.value
+                    dob : e.target.value,
+                    message : ''
                 })
             },
             handleRequest : (obj) => {
                 //alert('fetch');
-                console.log(obj);
-                fetch('http://localhost:3005/Signup/create', {
+                //console.log(obj);
+                return fetch('http://localhost:3005/Signup/create', {
                         method: 'POST',
                         headers: {
                             'Accept': 'application/json',
@@ -164,7 +196,6 @@ class SignupClass extends React.Component {
                         },
                         body: JSON.stringify(obj)
                     }).then(function(response) {
-                        console.log(response);
                         return response
                     }).catch((err) => {
                         console.log(err);
@@ -173,7 +204,7 @@ class SignupClass extends React.Component {
             handleSubmit : (e) => {                
                         e.preventDefault();
                         if(this.state.firstName !== '' && this.state.lastName !== '' && this.state.email !== '' && this.state.dob !==  'mm/dd/yyyy'){
-                            if(this.state.validateFirstName === null && this.state.validateLastName === null && this.state.validateEmail === null){
+                            if(this.state.validateFirstName === null && this.state.validateLastName === null && this.state.validateEmail === null && this.state.validatePassword === null){
                                 let obj = {
                                     first_name : this.state.firstName,
                                     last_name : this.state.lastName,
@@ -189,19 +220,33 @@ class SignupClass extends React.Component {
                                         let ret = this.state.handleRequest(obj);
                                         resolve(ret);
                                     }).then((resolve) => {
-                                         //alert(resolve);
-                                         this.setState({
-                                            firstName : '',
-                                            lastName : '',
-                                            email : '',
-                                            password : '',
-                                            dob : 'mm/dd/yyyy',
-                                            validateFirstName : null,
-                                            validateLastName : null,
-                                            validateEmail : null,
-                                            validateDob : null,
-                                            validatePassword : null
-                                        })
+                                        //alert(resolve);
+                                        if (resolve.status === 400) {
+                                            resolve.json().then(json => {
+                                              this.setState({
+                                                  message : json.message
+                                              })
+                                            });
+                                          }
+                                        else if(resolve.status === 200){
+
+                                            resolve.json().then(json => {
+                                                
+                                                //alert(json.userid)
+                                                this.setState({
+                                                    message : json.message
+                                                })
+                                                this.props.history.push('/EnterOTP/' + json.userid)
+                                            }).catch((err) => {
+                                                console.log(err);
+                                            });
+                                            
+                                            
+                                         } else {
+
+                                            alert("Server Error");
+                                         }
+                                         
                                     })
                             }
                         } else{
@@ -242,8 +287,19 @@ class SignupClass extends React.Component {
 function SignUpForm(props) {
         const classes = useStyles();
         return (
+            <div>
+            <div className ={classes.head}>
+                </div>
             <Container component="main" maxWidth="xs">
             <CssBaseline />
+            <Grid container>
+                <Grid item>
+                {(props.value.message !== '')? <Box textAlign="center" bgcolor="error.main" color="error.contrastText" p={1} m={1} style={{ width: '20rem'}}>
+                    {props.value.message}
+                </Box>:<Box textAlign="center" p={1} m={1} color="error.contrastText" style={{ width: '20rem'}}>{props.value.message}</Box>}
+                    
+                </Grid>
+            </Grid>
             <div className={classes.paper}>
                 <Avatar className={classes.avatar}>
                 <LockOutlinedIcon />
@@ -256,6 +312,7 @@ function SignUpForm(props) {
                     <Grid item xs={12} sm={6}>
                     {(props.value.validateFirstName === 'error')?(<TextField
                             error
+                            helperText="Enter Correct First Name"
                             autoComplete="fname"
                             name="firstName"
                             variant="outlined"
@@ -265,6 +322,7 @@ function SignUpForm(props) {
                             label="First Name"
                             value = {props.value.firstName}
                             onChange={props.value.handleFirstName}
+                            
                             autoFocus
                         />):(<TextField
                         autoComplete="fname"
@@ -282,6 +340,7 @@ function SignUpForm(props) {
                     <Grid item xs={12} sm={6}>
                     {(props.value.validateLastName === 'error')?(<TextField
                         error
+                        helperText="Enter Correct Last Name"
                         variant="outlined"
                         required
                         fullWidth
@@ -306,6 +365,7 @@ function SignUpForm(props) {
                     <Grid item xs={12}>
                     {(props.value.validateEmail === 'error')?(<TextField
                         error
+                        helperText="Enter Correct Email"
                         variant="outlined"
                         required
                         fullWidth
@@ -330,6 +390,7 @@ function SignUpForm(props) {
                     <Grid item xs={12}>
                         {(props.value.validateDob === 'error')?(<TextField
                             error
+                            helperText="Enter Correct Birthday"
                             variant="outlined"
                             required
                             fullWidth
@@ -358,7 +419,9 @@ function SignUpForm(props) {
                         />)}
                     </Grid>
                     <Grid item xs={12}>
-                        <TextField
+                        {(props.value.validatePassword === 'error')?(<TextField
+                            error
+                            helperText="Password should have equal to 8 or more than 8 characrters!"
                             variant="outlined"
                             required
                             fullWidth
@@ -369,7 +432,18 @@ function SignUpForm(props) {
                             value = {props.value.password}
                             onChange={props.value.handlePassword}
                             autoComplete="current-password"
-                        />
+                        />):(<TextField
+                            variant="outlined"
+                            required
+                            fullWidth
+                            name="password"
+                            label="Password"
+                            type="password"
+                            id="password"
+                            value = {props.value.password}
+                            onChange={props.value.handlePassword}
+                            autoComplete="current-password"
+                        />)}
                     </Grid>
                 </Grid>
                 <Button
@@ -390,10 +464,9 @@ function SignUpForm(props) {
                 </Grid>
                 </form>
             </div>
-            <Box mt={5}>
-                <MadeWithLove />
-            </Box>
             </Container>
+            <div className ={classes.foot}></div>
+        </div>
         );
 }
 
@@ -403,13 +476,13 @@ function SignUpForm(props) {
 
 function mapDispatchToProps(dispatch) {
     return {
-        loginUser : (i, l) => dispatch(loginUser(i, l))
+        saveToken : (token) => dispatch(saveToken(token))
     
     };
 }
 
 
 
-const Signup = connect(mapDispatchToProps)(SignupClass)
+const Signup = connect(null, mapDispatchToProps)(SignupClass)
 
 export default Signup;

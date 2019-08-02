@@ -1,3 +1,5 @@
+import { SAVE_TOKEN } from '../constant/action-types'
+
 
 import { LOGIN_USER } from '../constant/action-types'
 
@@ -13,15 +15,20 @@ import { LOGIN_USER } from '../constant/action-types'
 //     }
 //   }
 
-export default function loginUser(payload) {
-    alert('prateek');
-    fetch('/Signup/User', {
-        method: 'post',
-        body: JSON.stringify(payload)
-    }).then(function(response) {
-        return response.json();
-    })
+// export function loginUser(payload) {
+//     fetch('/Signup/User', {
+//         method: 'post',
+//         body: JSON.stringify(payload)
+//     }).then(function(response) {
+//         return response.json();
+//     })
+//     return {
+//         type : LOGIN_USER, payload
+//     }
+// } 
+
+export function saveToken(payload) {
     return {
-        type : LOGIN_USER, payload
+        type : SAVE_TOKEN, payload
     }
 } 
