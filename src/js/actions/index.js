@@ -1,5 +1,5 @@
 import { SAVE_TOKEN } from '../constant/action-types'
-
+import { SAVE_USER_DETAILS } from '../constant/action-types'
 
 import { LOGIN_USER } from '../constant/action-types'
 
@@ -32,3 +32,9 @@ export function saveToken(payload) {
         type : SAVE_TOKEN, payload
     }
 } 
+
+export function saveUserDetails(payload) {
+    return {
+        type : SAVE_USER_DETAILS, payload
+    }
+}

@@ -65,6 +65,7 @@ class SigninClass extends React.Component {
           validateEmail : null,
           validatePassword : null,
           message : '',
+          redirect : 0,
           handleEmailAddress : (e) => {
             if(e.target.value !== null){
                 var regEmail = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -139,8 +140,10 @@ class SigninClass extends React.Component {
                               isAuth : json.isAuth
                             }
                             sessionStorage.setItem("user", JSON.stringify(object));
-                            this.props.saveToken(json)
-                            //history.push('/Home')
+                            //this.props.saveToken(json)
+                            this.setState({
+                              redirect : 1
+                            })
                           } else if(json.message === 'Your Email is not Verified' ) {
                             this.setState({
                               message : json.message
@@ -177,7 +180,7 @@ class SigninClass extends React.Component {
 
       render(){
         return (
-            (this.state.message !== 'Login Successful')?<SigninForm value = {this.state} />:<Redirect to={'/Home'} />
+            (this.state.redirect === 0)?<SigninForm value = {this.state} />:<Redirect to={'/Home'} />
         )
 
       }
@@ -299,12 +302,8 @@ function SigninForm(props) {
   );
 }
 
-function mapDispatchToProps(dispatch){
-  return {
-    saveToken : (obj) => dispatch(saveToken(obj))
-  }
-}
 
-const Signin = connect(null, mapDispatchToProps)(SigninClass)
 
-export default Signin;
+//const Signin = connect(null, mapDispatchToProps)(SigninClass)
+
+export default SigninClass;

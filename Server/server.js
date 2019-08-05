@@ -41,6 +41,7 @@ const Sequelize = require('sequelize');
     app.use('/ForgotPasswordCheckOtp', require('../api/ForgotPasswordCheckOtp'));
     app.use('/SaveNewPassword', require('../api/SaveNewPassword'));
     app.use('/Home', require('../api/Home'));
+    app.use('/SavePost', require('../api/SavePost'));
 
 
    app.get('/', (req, res) => res.send('api running'));

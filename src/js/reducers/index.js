@@ -1,7 +1,8 @@
 const initialState = {
     users : null,
     token : null,
-    isAuth : false
+    isAuth : false,
+    userDetails : null
   };
 
 function rootReducer (state = initialState, action) {
@@ -14,10 +15,16 @@ function rootReducer (state = initialState, action) {
           token: action.payload.token,
           isAuth : action.payload.isAuth,
 
-      }
+      } 
+    } else if(action.type === 'SAVE_USER_DETAILS'){
+        console.log(action.payload);
+        return {
+          ...state,
+          userDetails : action.payload
+        }
     }
-    return state;
-}
+    return state; 
+} 
 
 
 export default rootReducer

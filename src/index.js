@@ -4,7 +4,7 @@ import { Provider } from "react-redux";
 import store from "./js/store/index";
 import App from "./js/components/App";
 import Root from './js/components/root'
-//import './css/Page.css'
+import './css/styles.css'
 // if you're in create-react-app import the files as:
 // import store from "./js/store/index";
 // import App from "./js/components/App.jsx";
