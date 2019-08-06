@@ -166,7 +166,7 @@ function PermanentDrawer(props) {
       if(obj.isAuth === true){
         obj.isAuth = false;
       }
-      sessionStorage.setItem('user', obj);
+      sessionStorage.setItem('user', JSON.stringify(obj));
     }
 
     function handleProfileMenuOpen(event) {

@@ -1,5 +1,11 @@
 let user = require('../Model/UserRegistration.js')
+let post = require('../Model/Post.js')
+let friends = require('../Model/Friend.js')
+let friend_request = require('../Model/Friend_Request.js')
 const nodemailer = require("nodemailer");
+let Sequelize = require('sequelize')
+const { Client } = require("pg");
+const uuid = require('uuidv4');
 
 async function create (body) {
     console.log(body);
@@ -140,6 +146,153 @@ async function send_mail (otp) {
     })
 }
 
+async function savePost (body) {
+
+    return await post.create(body).then((obj) => {
+        console.log(JSON.stringify(obj));
+        return JSON.stringify(obj);
+    }).catch((err) => {
+        return err;
+    })
+}
+
+async function fetchPost (userid) {
+
+    // var connectionString = "postgres://postgres:qwerty@localhost:5432/facebook_app";
+
+    // return await pg.connect(connectionString,function(err,client) {
+    //     if(err){
+    //         console.log("not able to get connection "+ err);
+    //         //res.status(400).send(err);
+    //     } 
+    //     client.query('SELECT * FROM Posts Where userid IN ( SELECT friend_id FROM friends WHERE userid = $1)', [userid],function(err,result) {
+    //         if(err){
+    //             console.log(err);
+    //             //res.status(400).send(err);
+    //         } else {
+    //             console.log(result.rows);
+    //         }
+    //     });
+    //  });
+    const client = new Client({
+        user: 'postgres',
+        host: 'localhost',
+        database: 'facebook_app',
+        password: 'qwerty',
+        port: 5432,
+    })
+
+    client.query('SELECT `post_id`, `post_content` FROM Posts Where userid IN ( SELECT friend_id FROM friends WHERE userid = $1)', [userid],function(err,result) {
+                if(err){
+                    console.log(err);
+                    //res.status(400).send(err);
+                } else {
+                    console.log(result.rows);
+                }
+            });
+
+    return await post.findAll({
+        include: [{
+            model: friends,
+            where: { userid : Sequelize.col('post.userid'),
+            userid : userid
+        }
+        }]
+    }).then((obj) => {
+        console.log(obj);
+    }).catch(err => console.log(err));
+
+    // return await post.findAll(userid).then((obj) => {
+    //     console.log(JSON.stringify(obj));
+    //     return JSON.stringify(obj);
+    // }).catch((err) => {
+    //     return err;
+    // })
+}
+
+async function saveRequest (body) {
+
+    return await friend_request.create(body).then((obj) => {
+        console.log(JSON.stringify(obj));
+        return JSON.stringify(obj);
+    }).catch((err) => {
+        return err;
+    })
+}
+
+//  Accepting Friend Request
+
+async function findFriend(body){
+    return await friends.findOne({where :
+        {
+            userid : body.requestperson_id
+        }}).then(async (obj) => {
+        console.log(JSON.stringify(obj));
+        obj = JSON.parse(JSON.stringify(obj));
+        if(obj !== null) {
+            obj.friend_id.push(body.userid);
+            return await friends.update(
+                {friend_id : obj.friend_id},
+                {where: {
+                    userid : body.requestperson_id
+                }}
+              )
+              .then(function(rowsUpdated) {
+                console.log('here');
+                return "Updated";
+              })
+              .catch((err)=> {
+                    console.log(err);
+              })
+        } else {
+            console.log("here");
+            let arr = [];
+            arr.push(body.userid);
+            let ob = {
+                userid : body.requestperson_id,
+                column_id : uuid(),
+                friend_id : arr
+            }
+            return await friends.create(ob)
+              .then( async (rowsUpdated)=>{
+                console.log('here');
+                
+              })
+              .catch((err)=> {
+                    console.log(err);
+              })
+        }
+    }).catch((err) => {
+        return err;
+    })
+}
+
+async function acceptRequest (body) {
+    console.log(body.requestperson_id)
+    return await findFriend(body).then(async (obj) => {
+        let ob = {
+            userid : body.requestperson_id,
+            requestperson_id : body.userid 
+        }
+        return await findFriend(ob).then( async (obj) => {
+            return await friend_request.destroy({where : body}).then((str)=>{
+                console.log("deleted");
+            }).catch(err => console.log(err))
+        }).catch(err => console.log(err))
+    }).catch(err => console.log(err))
+    
+}
+
+// ------Ends ------//
+
+async function fetchRequest (body) {
+
+    return await friend_request.findAll({where : body}).then((obj) => {
+        console.log(JSON.stringify(obj));
+        return JSON.stringify(obj);
+    }).catch(err => console.log(err));
+}
+
 async function main(otp){
 
     // Generate test SMTP service account from ethereal.email
@@ -184,7 +337,12 @@ let services = {
     saveOtpByEmail : saveOtpByEmail,
     checkOtpByEmail : checkOtpByEmail,
     saveNewPassword : saveNewPassword,
-    fetch : fetch
+    fetch : fetch,
+    savePost : savePost,
+    fetchPost : fetchPost,
+    saveRequest : saveRequest,
+    acceptRequest : acceptRequest,
+    fetchRequest : fetchRequest,
 }
 
 module.exports = services;

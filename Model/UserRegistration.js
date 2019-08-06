@@ -1,6 +1,5 @@
 let sequel = require('../Server/server.js')
 
-
 const user = sequel.sequelize.define('UserRegistration', {
     first_name:
     {
@@ -45,5 +44,7 @@ const user = sequel.sequelize.define('UserRegistration', {
 {
     timestamps : false
 });
+
+
 
 module.exports = user

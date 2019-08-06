@@ -34,14 +34,7 @@ router.post('/', (req, res, next) => {
         if(err){
             console.log(err);
         } else if(user) {
-            let postid = uuid();
-            let body = req.body;
-            body.post_id = postid;
-            body.userid = req.body.userid;
-            body.likes = 0;
-            body.timestamp = new Date();
-            
-            services.savePost(body).then((obj)=> {
+            services.fetchRequest(req.body).then((obj)=> {
 
                 res.status(200).json({post : obj})
 

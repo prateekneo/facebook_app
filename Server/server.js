@@ -42,6 +42,10 @@ const Sequelize = require('sequelize');
     app.use('/SaveNewPassword', require('../api/SaveNewPassword'));
     app.use('/Home', require('../api/Home'));
     app.use('/SavePost', require('../api/SavePost'));
+    app.use('/FetchPost', require('../api/FetchPost'));
+    app.use('/SendFriendRequest', require('../api/SendFriendRequest'));
+    app.use('/AcceptFriendRequest', require('../api/AcceptFriendRequest'));
+    app.use('/ShowFriendRequest', require('../api/ShowFriendRequest'));
 
 
    app.get('/', (req, res) => res.send('api running'));
