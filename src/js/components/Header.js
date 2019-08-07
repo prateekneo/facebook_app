@@ -306,38 +306,7 @@ function PermanentDrawer(props) {
     <div className={classes.root}>
     <Grid container style={{marginTop : "70px"}}>
         <Grid item xs={3} sm={3}>
-            <nav className={classes.drawer} aria-label="mailbox folders">
-                {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
-                <Hidden smUp className='abcs' implementation="css">
-                <Drawer
-                    container={container}
-                    variant="temporary"
-                    open={mobileOpen}
-                    onClose={handleDrawerToggle}
-                    classes={{
-                    paper: classes.drawerPaper,
-                    }}
-                    ModalProps={{
-                    keepMounted: true, // Better open performance on mobile.
-                    }}
-                >
-                    {drawer}
-                </Drawer>
-                </Hidden>
-
-                <Hidden xsDown implementation="css">
-                <Drawer
-                    classes={{
-                    paper: classes.drawerPaper,
-                    }}
-
-                    variant="permanent"
-                    open
-                >
-                    {drawer}
-                </Drawer>
-                </Hidden>
-            </nav>
+            
         </Grid>
         <Grid item xs={9} sm={9}> 
           <Grid item xs ={12}>
@@ -362,3 +331,21 @@ function PermanentDrawer(props) {
   }
 
 export default PermanentDrawer
+
+
+<AppBar position="fixed" className={classes.appBar}>
+        <Toolbar>
+          <IconButton
+            color="inherit"
+            aria-label="open drawer"
+            edge="start"
+            onClick={props.handleDrawerToggle}
+            className={classes.menuButton}
+          >
+            <MenuIcon />
+          </IconButton>
+          <Typography variant="h6" noWrap>
+            Responsive drawer
+          </Typography>
+        </Toolbar>
+      </AppBar>

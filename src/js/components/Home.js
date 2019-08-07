@@ -3,7 +3,20 @@ import { connect } from 'react-redux'
 import { saveUserDetails } from '../actions/index'
 import { saveToken } from '../actions/index'
 import { Redirect } from 'react-router-dom'
-import Header from './Header'
+import { makeStyles, useTheme } from '@material-ui/core/styles';
+import CssBaseline from '@material-ui/core/CssBaseline';
+import Head from './Head'
+import Sidebar from './Sidebar'
+import Main_Page from './Main_page'
+import { Grid } from '@material-ui/core';
+
+const useStyles = makeStyles(theme => ({
+
+    root: {
+        display: 'flex',
+      },
+
+}));
 
 class HomePage extends React.Component {
 
@@ -38,13 +51,33 @@ class HomePage extends React.Component {
 
     render () {
         let obj = JSON.parse(sessionStorage.getItem('user'));
+        
         return (
             <div>
-                {(obj)?(obj.isAuth === true)?<Header />: null: <Redirect to={'/Signin'} />}
+                {(obj)?(obj.isAuth === true)?
+                 <Page />:null: <Redirect to={'/Signin'} />}
             </div>
+
         )
     }
 
+}
+
+const Page = () => {
+    const classes = useStyles();
+    return (
+        <div className={classes.root}>
+            <CssBaseline />
+            <Sidebar />
+            <Grid container spacing={3}>
+                <Grid item xs={12}>
+                        <Head />
+                </Grid>
+                
+                <Main_Page />
+            </Grid>
+        </div>
+    )
 }
 
 const mapStateToProps = state => {
@@ -61,7 +94,7 @@ function mapDispatchToProps(dispatch){
         saveToken : (user) => dispatch(saveToken(user)),
         saveUserDetails : (userDetails)=> dispatch(saveUserDetails(userDetails))
     }
-  }
+}
 
 const Home = connect(mapStateToProps, mapDispatchToProps)(HomePage)
 

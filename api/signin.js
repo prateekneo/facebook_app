@@ -5,6 +5,9 @@ const nodemailer = require("nodemailer");
 const express = require('express');
 const router = express.Router();
 
+var Analytics = require('analytics-node');
+var analytics = new Analytics('YOUR_WRITE_KEY');
+
 const bcrypt = require('bcrypt');
 
 var jwt = require('jsonwebtoken');

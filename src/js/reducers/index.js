@@ -2,7 +2,8 @@ const initialState = {
     users : null,
     token : null,
     isAuth : false,
-    userDetails : null
+    userDetails : null,
+    mobileOpen : false,
   };
 
 function rootReducer (state = initialState, action) {
@@ -22,7 +23,12 @@ function rootReducer (state = initialState, action) {
           ...state,
           userDetails : action.payload
         }
-    }
+    } else if(action.type === 'TOGGLE_SIDEBAR'){
+      return {
+        ...state,
+        mobileOpen : !state.mobileOpen
+      }
+  }
     return state; 
 } 
 

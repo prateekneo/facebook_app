@@ -174,32 +174,57 @@ async function fetchPost (userid) {
     //         }
     //     });
     //  });
-    const client = new Client({
-        user: 'postgres',
-        host: 'localhost',
-        database: 'facebook_app',
-        password: 'qwerty',
-        port: 5432,
-    })
+    // const client = new Client({
+    //     user: 'postgres',
+    //     host: 'localhost',
+    //     database: 'facebook_app',
+    //     password: 'qwerty',
+    //     port: 5432,
+    // })
 
-    client.query('SELECT `post_id`, `post_content` FROM Posts Where userid IN ( SELECT friend_id FROM friends WHERE userid = $1)', [userid],function(err,result) {
-                if(err){
-                    console.log(err);
-                    //res.status(400).send(err);
-                } else {
-                    console.log(result.rows);
-                }
-            });
+    // client.query('SELECT `post_id`, `post_content` FROM Posts Where userid IN ( SELECT friend_id FROM friends WHERE userid = $1)', [userid],function(err,result) {
+    //             if(err){
+    //                 console.log(err);
+    //                 //res.status(400).send(err);
+    //             } else {
+    //                 console.log(result.rows);
+    //             }
+    //         });
+    const Op = Sequelize.Op;
+    return await friends.findAll({
+            where: { 
+                    userid : userid
+                    }
+    }).then(async (obj) => {
+            ///console.log(obj);
+            let ob = JSON.parse(JSON.stringify(obj));
+            //console.log(ob);
+            if(ob.length > 0){
+                console.log(JSON.stringify(obj));
+                console.log(ob[0].friend_id.push(userid));
+                return await post.findAll({
+                    where : {
+                        userid : {
+                            [Op.in] : ob[0].friend_id
+                        }
+                    }
+                }).then((obj) => {
 
-    return await post.findAll({
-        include: [{
-            model: friends,
-            where: { userid : Sequelize.col('post.userid'),
-            userid : userid
-        }
-        }]
-    }).then((obj) => {
-        console.log(obj);
+                    console.log(JSON.stringify(obj));
+                    return JSON.parse(JSON.stringify(obj));
+                }).catch(err => console.log(err))
+            } else {
+                return await post.findAll({
+                    where : {
+                        userid : {
+                            [Op.in] : [userid]
+                        }
+                    }
+                }).then((obj) => {
+                    console.log(JSON.stringify(obj));
+                    return JSON.parse(JSON.stringify(obj));
+                }).catch(err => console.log(err))
+            }
     }).catch(err => console.log(err));
 
     // return await post.findAll(userid).then((obj) => {
@@ -277,6 +302,7 @@ async function acceptRequest (body) {
         return await findFriend(ob).then( async (obj) => {
             return await friend_request.destroy({where : body}).then((str)=>{
                 console.log("deleted");
+                res.status(200).send({message : "Request Accepted"})
             }).catch(err => console.log(err))
         }).catch(err => console.log(err))
     }).catch(err => console.log(err))

@@ -40,7 +40,65 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-export default function RecipeReviewCard() {
+
+class PostCard extends React.Component {
+  constructor(props){
+    super(props)
+    this.state = {
+        post : []
+    }
+  }
+
+  componentWillMount(){
+
+      let ob = JSON.parse(sessionStorage.getItem('user')); 
+
+      let obj = {
+          userid : ob.userid
+      }
+
+      fetch('http://localhost:3005/FetchPost', {
+          method: 'POST',
+          headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+              'Authorization' : 'bearer ' + ob.token
+          },
+          body : JSON.stringify(obj)
+      }).then( async (response) => {
+              if(response.status === 200){
+                  response.json().then( json => {
+                    console.log(json.post);
+                    this.setState({
+                        post : json.post
+                    })
+
+                  });
+                  // await setTimeout(() => {
+
+                  // }, 3000).then({
+
+                  // })
+
+              }
+      }).catch(err => console.log(err))
+  }
+
+  saveLike = (post_id) => {
+      
+  }
+
+  render(){
+    return (
+        (this.state.post.length > 0)?this.state.post.map((value, index) => {
+          return <RecipeReviewCard value={value} saveLike={this.saveLike} />
+        }):null
+    )
+  }
+
+}
+
+const RecipeReviewCard = (props) => {
   const classes = useStyles();
   const [expanded, setExpanded] = React.useState(false);
 
@@ -71,12 +129,11 @@ export default function RecipeReviewCard() {
       />
       <CardContent>
         <Typography variant="body2" color="textSecondary" component="p">
-          This impressive paella is a perfect party dish and a fun meal to cook together with your
-          guests. Add 1 cup of frozen peas along with the mussels, if you like.
+          {props.value.post_content}
         </Typography>
       </CardContent>
       <CardActions disableSpacing>
-        <IconButton aria-label="add to favorites">
+        <IconButton aria-label="add to favorites" onClick={() => props.saveLike(props.value.post_id)}>
           <FavoriteIcon />
         </IconButton>
         <IconButton aria-label="share">
@@ -123,3 +180,5 @@ export default function RecipeReviewCard() {
     </Card>
   );
 }
+
+export default PostCard

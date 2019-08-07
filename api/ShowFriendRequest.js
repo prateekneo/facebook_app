@@ -36,7 +36,7 @@ router.post('/', (req, res, next) => {
         } else if(user) {
             services.fetchRequest(req.body).then((obj)=> {
 
-                res.status(200).json({post : obj})
+                res.status(200).json({request : JSON.parse(obj)})
 
             }).catch((err) => {
                 console.log(err);

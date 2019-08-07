@@ -1,31 +1,6 @@
 import { SAVE_TOKEN } from '../constant/action-types'
 import { SAVE_USER_DETAILS } from '../constant/action-types'
-
-import { LOGIN_USER } from '../constant/action-types'
-
-// export function getData() {
-//     return function (dispatch) {
-//         return fetch("https://jsonplaceholder.typicode.com/users")
-//         .then(response => response.json())
-//       .then(json => {
-//           console.log(json);
-          
-//         dispatch({ type: DATA_LOADED, payload: json });
-//       });
-//     }
-//   }
-
-// export function loginUser(payload) {
-//     fetch('/Signup/User', {
-//         method: 'post',
-//         body: JSON.stringify(payload)
-//     }).then(function(response) {
-//         return response.json();
-//     })
-//     return {
-//         type : LOGIN_USER, payload
-//     }
-// } 
+import { TOGGLE_SIDEBAR } from '../constant/action-types' 
 
 export function saveToken(payload) {
     return {
@@ -36,5 +11,11 @@ export function saveToken(payload) {
 export function saveUserDetails(payload) {
     return {
         type : SAVE_USER_DETAILS, payload
+    }
+}
+
+export function toggleSidebar() {
+    return {
+        type : TOGGLE_SIDEBAR
     }
 }
